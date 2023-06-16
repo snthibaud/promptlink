@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Authentication</title>
+  <style>
+    /* Add some basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="status">Please wait a moment...</h1>
+  <p id="subtitle"></p>
+
+  <script>
+    // Function to update the status message
+    function updateStatus(status) {
+      let message = {
+        "success": "Success!",
+        "failure": "Authentication failed, try again...",
+        "waiting": "Waiting for input...",
+        "authenticating": "Authenticating..."
+      }
+      console.log(message[status])
+      document.getElementById("status").innerHTML = message[status];
+      if (status === "success") {
+        document.getElementById("subtitle").innerHTML = "This page can be closed now."
+      }
+    }
+
+    function makeRequest(action, body) {
+      return fetch("/", {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authentication-ID': "{{ authentication_id }}",
+          'X-Action': action
+        }
+      })
+    }
+
+    function executeIfStatus(request, status, fa, fb) {
+      request.then(function(response) {
+        response.text().then(function (body) {
+          if (body === status) {
+            fa(body);
+          } else {
+            fb(body);
+          }
+        })
+      })
+    }
+
+    function waitUntilReady() {
+      executeIfStatus(
+              makeRequest('authenticate', {}), "ready", function(_) {sendInput()}, function (_) {setTimeout(waitUntilReady, 1000)})
+    }
+
+    function startAuthentication() {
+      makeRequest('start', {});
+      waitUntilReady()
+    }
+
+    function onAuthenticationResult (f) {
+      executeIfStatus(makeRequest("poll_authentication_status", {}), "authenticating",
+              function () {setTimeout(function () {onAuthenticationResult(f)}, 1000)}, f)
+    }
+
+    function sendInput() {
+      updateStatus("waiting")
+      let input = prompt("Please enter your authentication code:");
+      updateStatus("authenticating")
+      makeRequest("authenticate", {"input": input}).then(
+        function(_) {
+          onAuthenticationResult(function (status) {
+            updateStatus(status)
+            if (status !== "success") {
+              sendInput()
+            }
+          })
+        }
+      )
+    }
+
+    window.onload = startAuthentication;
+  </script>
+</body>
+</html>

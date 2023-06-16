@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "promptlink"
+version = "0.1.0"
+description = "Simplify user authentication and secure access from anywhere with customizable prompts and temporary links."
+authors = ["Stéphane Thibaud <snthibaud@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+functions-framework = "*"
+google-cloud-pubsub = "*"
+google-cloud-functions = "*"
+google-cloud-storage = "*"
+pyyaml = "*"
+Jinja2 = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
