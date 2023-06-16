@@ -32,7 +32,8 @@ from promptlink import Authenticator
 
 
 with Authenticator(send_link_callback=lambda l: print(f"URL: {l}")) as authenticator:
-    # The code in this block is executed after the link has been accessed in order to avoid authentication timeouts
+    # The code in this block is executed after the link has been accessed 
+    # in order to avoid authentication timeouts
     print("Setting up authentication...")
     authenticator.authenticate(lambda s: s == "12345678")
     # Below statements will be reached after '12345678' was input on the webpage prompt
