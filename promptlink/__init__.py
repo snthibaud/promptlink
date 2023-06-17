@@ -69,7 +69,6 @@ class Authenticator:
         self._subscriber = SubscriberClient()
         self._subscriber.create_subscription(request={"name": self.subscription_path, "topic": topic_path})
         self._subscriber.subscribe(self.subscription_path, callback=self._handle_message)
-        print("Added subscription")
         self.send_link_callback(self._link)
         self._website_accessed.wait()
         return self
