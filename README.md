@@ -44,7 +44,8 @@ with Authenticator(send_link_callback=lambda l: print(f"URL: {l}")) as authentic
 The following permissions are needed for this library:
 - Permissions to create Storage buckets and objects
 - Permissions to set up a Pub/Sub topic and subscriptions
-- Permissions to deploy a Cloud Function    
+- Permissions to deploy a Cloud Function  
+
 The library will attempt to use the default service account.
 
 ## License
