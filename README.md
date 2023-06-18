@@ -47,6 +47,7 @@ The following permissions are needed for this library:
 - Permissions to deploy a Cloud Function  
 
 The library will attempt to use the default service account.
+Any resources created will be named 'promptlink-' followed by a random UUID, so that collision with existing resources is extremely unlikely.
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
