@@ -36,11 +36,11 @@ class Authenticator:
             f"gcloud functions deploy {self._function_name} --gen2 "
             f"--region={self.gcp_region} --runtime=python39 "
             f"--source=\"{Path(__file__).resolve().parent}\" --entry-point=entrypoint --trigger-http "
-            f"--allow-unauthenticated", capture_output=True, text=True, shell=True).stdout
+            f"--allow-unauthenticated", capture_output=True, text=True, shell=True)
         try:
-            return safe_load(output)["serviceConfig"]["uri"]
+            return safe_load(output.stdout)["serviceConfig"]["uri"]
         except TypeError:
-            print(output)
+            print(output.stderr)
             raise
 
     def _remove_cloud_function(self):
