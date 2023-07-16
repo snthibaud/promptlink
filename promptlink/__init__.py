@@ -32,11 +32,16 @@ class Authenticator:
 
     def _deploy_cloud_function(self) -> str:
         self._function_name = f"promptlink-{self._authentication_id}"
-        return safe_load(run(
+        output = run(
             f"gcloud functions deploy {self._function_name} --gen2 "
             f"--region={self.gcp_region} --runtime=python39 "
             f"--source=\"{Path(__file__).resolve().parent}\" --entry-point=entrypoint --trigger-http "
-            f"--allow-unauthenticated", capture_output=True, text=True, shell=True).stdout)["serviceConfig"]["uri"]
+            f"--allow-unauthenticated", capture_output=True, text=True, shell=True).stdout
+        try:
+            return safe_load(output)["serviceConfig"]["uri"]
+        except TypeError:
+            print(output)
+            raise
 
     def _remove_cloud_function(self):
         print(run(f"gcloud functions delete {self._function_name} --quiet",
