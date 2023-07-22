@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "promptlink"
-version = "0.1.3"
+version = "0.1.4"
 description = "Simplify user authentication and secure access from anywhere with customizable prompts and temporary links."
 authors = ["Stéphane Thibaud <snthibaud@gmail.com>"]
 readme = "README.md"

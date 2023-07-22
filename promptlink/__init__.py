@@ -102,7 +102,10 @@ class Authenticator:
             f.write("success" if result else "failure")
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.bucket.delete(force=True)
+        try:
+            self.bucket.delete(force=True)
+        except NotFound:
+            pass
         self._remove_cloud_function()
         self._subscriber.delete_subscription(request={"subscription": self.subscription_path})
         self._publisher.delete_topic(request={"topic": get_topic_path(str(self._authentication_id))})
