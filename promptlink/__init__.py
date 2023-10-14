@@ -44,7 +44,7 @@ class Authenticator:
             raise
 
     def _remove_cloud_function(self):
-        print(run(f"gcloud functions delete {self._function_name} --quiet",
+        print(run(f"gcloud functions delete --region {self.gcp_region} --gen2 {self._function_name} --quiet",
                   capture_output=True, text=True, shell=True).stdout)
 
     def _handle_message(self, message: Message):
@@ -74,7 +74,11 @@ class Authenticator:
         self._subscriber = SubscriberClient()
         self._subscriber.create_subscription(request={"name": self.subscription_path, "topic": topic_path})
         self._subscriber.subscribe(self.subscription_path, callback=self._handle_message)
-        self.send_link_callback(self._link)
+        try:
+            self.send_link_callback(self._link)
+        except Exception:
+            self._teardown()
+            raise
         self._website_accessed.wait()
         return self
 
@@ -101,7 +105,7 @@ class Authenticator:
         with self.bucket.blob(AUTHENTICATION_RESULT_BLOB).open("w") as f:
             f.write("success" if result else "failure")
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def _teardown(self):
         try:
             self.bucket.delete(force=True)
         except NotFound:
@@ -109,3 +113,6 @@ class Authenticator:
         self._remove_cloud_function()
         self._subscriber.delete_subscription(request={"subscription": self.subscription_path})
         self._publisher.delete_topic(request={"topic": get_topic_path(str(self._authentication_id))})
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._teardown()
